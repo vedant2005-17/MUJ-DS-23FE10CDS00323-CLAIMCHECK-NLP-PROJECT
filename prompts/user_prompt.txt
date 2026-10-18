@@ -1,0 +1,15 @@
+Text to assess:
+"""
+{article}
+"""
+
+Statistics computed from the text (weak hints):
+- words: {word_count}
+- average sentence length: {avg_sentence_len}
+- exclamation marks: {exclamations}
+- share of ALL-CAPS words: {all_caps_ratio}
+- sensational words found: {sensational_found}
+- clickbait phrases found: {clickbait_found}
+- vague sourcing phrases found: {vague_found}
+
+Return the JSON object now.

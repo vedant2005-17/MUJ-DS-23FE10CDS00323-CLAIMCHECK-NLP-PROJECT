@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f8f5">
+  <title>Claimcheck — Question the claim</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Claimcheck home">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <span>Claimcheck</span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a class="nav-link active" href="#analyze">Analyze</a>
+      <a class="nav-link" href="#history" id="history-link">History</a>
+      <a class="nav-link" href="#about">About</a>
+    </nav>
+    <div class="header-pill"><span class="pulse-dot"></span> AI-assisted analysis</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow"><span class="eyebrow-line"></span> A clearer view of the news</p>
+      <h1>Check the story.<br><span>Question the claim.</span></h1>
+      <p class="hero-copy">Paste an article or social post to inspect suspicious wording, understand the signals, and identify claims worth verifying.</p>
+    </section>
+
+    <section class="workspace" id="analyze" aria-label="News analysis workspace">
+      <section class="panel input-panel" aria-label="Text to check">
+        <div class="panel-heading">
+          <div class="heading-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 3.75h7l5 5v11.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z"/><path d="M14 3.75v5h5M8.5 13h7M8.5 16.5h7"/></svg>
+          </div>
+          <div class="heading-copy">
+            <h2>Article to analyze</h2>
+            <p>Paste a news article, headline, or social post.</p>
+          </div>
+          <button id="clear" class="icon-button" type="button" title="Clear text" aria-label="Clear text">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 10v7M14 10v7"/></svg>
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <label class="sr-only" for="text">Paste text to analyze</label>
+        <textarea id="text" maxlength="{{ max_chars }}" placeholder="Paste the text here. At least 15 words works best." aria-describedby="input-help count"></textarea>
+        <div id="doc" class="doc" hidden></div>
+
+        <div class="input-meta">
+          <span id="count" class="muted">0 of {{ max_chars }} characters</span>
+          <div id="legend" class="legend" hidden>
+            <span><i class="mark loaded on"></i> flagged wording</span>
+            <span><i class="mark vague on"></i> vague sourcing</span>
+          </div>
+          <button id="edit" class="text-button" type="button" hidden>Edit text</button>
+        </div>
+        <p id="input-help" class="input-help">Your text is analyzed for language patterns and claims that may need independent verification.</p>
+
+        <div class="examples">
+          <span class="examples-label">Try an example</span>
+          <button id="sample-fake" class="example-chip" type="button">Viral health claim</button>
+          <button id="sample-real" class="example-chip" type="button">Local news report</button>
+        </div>
+        <p id="error" class="error" role="alert" hidden></p>
+        <button id="go" class="primary-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+          <span>Analyze article</span>
+          <svg class="button-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+        <p class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.5-2.9 7.8-7 10-4.1-2.2-7-5.5-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></svg> Treat the result as a signal, not proof.</p>
+      </section>
+
+      <aside class="panel results-panel" aria-live="polite" aria-label="Analysis results">
+        <div class="results-heading">
+          <div class="heading-icon chart-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5h16M6.5 16V10M11.5 16V5M16.5 16v-3"/></svg>
+          </div>
+          <div>
+            <h2>Analysis report</h2>
+            <p>Signals from your submitted text</p>
+          </div>
+          <span class="report-status" id="report-status">Ready</span>
+        </div>
+
+        <div id="empty" class="empty-state">
+          <div class="empty-illustration" aria-hidden="true">
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+            <div class="paper-icon"><svg viewBox="0 0 24 24"><path d="M7 3.75h7l5 5v11.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z"/><path d="M14 3.75v5h5M8.5 13h7M8.5 16.5h5"/></svg></div>
+          </div>
+          <h3>Your analysis starts here</h3>
+          <p>Submit a text to see its overall assessment, red flags, and claims that deserve a closer look.</p>
+          <div class="empty-steps">
+            <div><span>01</span><p>Paste a story or choose an example</p></div>
+            <div><span>02</span><p>Analyze its wording and claims</p></div>
+            <div><span>03</span><p>Review the signals and verify independently</p></div>
+          </div>
+        </div>
+
+        <div id="result" hidden>
+          <div id="verdict-card" class="verdict-card">
+            <div class="verdict-symbol" aria-hidden="true" id="verdict-symbol">!</div>
+            <div class="verdict-copy">
+              <span class="mini-label">OVERALL ASSESSMENT</span>
+              <p id="verdict" class="verdict"></p>
+              <p id="summary" class="summary"></p>
+            </div>
+          </div>
+
+          <div class="score-card">
+            <div class="score-topline"><span>Style suspicion score</span><span class="score-caption">0–100</span></div>
+            <div class="score-value-row"><strong id="score-value">—</strong><span>/ 100</span><span id="score-level" class="score-level">Pending</span></div>
+            <div class="score-track" role="img" aria-label="Suspicion score from 0 to 100"><span id="score-fill"></span><i id="pin"></i></div>
+            <div class="score-labels"><span>Lower signal</span><span>Higher signal</span></div>
+            <p id="score-line" class="score-note"></p>
+          </div>
+
+          <section class="result-section">
+            <div class="section-title-row"><h3>Signals detected</h3><span id="flag-count" class="count-badge">0</span></div>
+            <ul id="flags" class="result-list"></ul>
+          </section>
+
+          <section class="result-section">
+            <div class="section-title-row"><h3>Claims worth verifying</h3></div>
+            <ul id="claims" class="result-list claim-list"></ul>
+          </section>
+
+          <section class="reasoning-card">
+            <div class="reasoning-heading"><span class="small-icon">i</span><h3>Why this result?</h3></div>
+            <p id="reasoning"></p>
+          </section>
+
+          <details class="stats-details">
+            <summary><span>Text statistics</span><span class="details-plus">+</span></summary>
+            <dl class="stats" id="stats"></dl>
+          </details>
+          <p class="disclaimer">Claimcheck evaluates language patterns and internal plausibility. It does not independently prove whether a claim is true.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="below-grid" id="about">
+      <div class="below-card"><span class="below-icon">01</span><h3>Look for the signals</h3><p>Highlighted phrases point to wording patterns such as sensational language or vague sourcing.</p></div>
+      <div class="below-card"><span class="below-icon">02</span><h3>Check the claims</h3><p>Use the claims list as a starting point for checking reliable, independent sources.</p></div>
+      <div class="below-card"><span class="below-icon">03</span><h3>Keep a critical eye</h3><p>A score is not a fact-check verdict. Context, evidence, and source quality still matter.</p></div>
+    </section>
+    <section id="history" class="history-anchor" aria-label="History information">
+      <span class="history-dot"></span> This version does not save analysis history between sessions.
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="brand footer-brand" href="/"><span class="brand-mark">C</span><span>Claimcheck</span></a><span>Built to encourage careful reading, not replace verification.</span></footer>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

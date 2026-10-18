@@ -1,0 +1,55 @@
+# Central configuration. Change behaviour here instead of editing code.
+
+llm:
+  # provider: gemini (free tier) or anthropic (paid)
+  provider: gemini
+  model: gemini-3.8-flash
+  max_tokens: 2048
+  temperature: 0.2
+  timeout_seconds: 120
+  max_retries: 2   # used by the anthropic provider
+  system_prompt_file: prompts/system_prompt.txt
+  user_prompt_file: prompts/user_prompt.txt
+
+app:
+  max_input_chars: 6000
+  min_input_words: 15
+  port: 5000
+
+scoring:
+  # final_score = llm_weight * llm_score + (1 - llm_weight) * heuristic_score
+  llm_weight: 0.75
+  # (upper bound of score, label); first match wins
+  bands:
+    - [25, "Likely reliable"]
+    - [50, "Needs checking"]
+    - [75, "Likely misleading"]
+    - [100, "Likely fake"]
+
+heuristics:
+  # points added to the suspicion score (0-100) per feature, capped per feature
+  weights:
+    sensational_words: 6
+    clickbait_phrases: 12
+    vague_sourcing: 12
+    exclamations: 4
+    all_caps_ratio: 150
+    second_person_ratio: 100
+  caps:
+    sensational_words: 30
+    clickbait_phrases: 24
+    vague_sourcing: 24
+    exclamations: 12
+    all_caps_ratio: 20
+    second_person_ratio: 10
+
+lexicons:
+  sensational_words: [shocking, unbelievable, outrageous, bombshell, exposed, explosive,
+    secret, miracle, terrifying, destroyed, slammed, horrifying, scandal, conspiracy,
+    hoax, cover-up, banned, urgent, breaking, devastating]
+  clickbait_phrases: ["you won't believe", "what happens next", "doctors hate",
+    "share before", "they don't want you to know", "mainstream media", "wake up",
+    "the truth about", "this one trick", "going viral"]
+  vague_sourcing: ["sources say", "experts say", "people are saying", "some say",
+    "it is rumored", "insiders claim", "reportedly", "many believe", "a study shows",
+    "scientists claim", "anonymous"]
